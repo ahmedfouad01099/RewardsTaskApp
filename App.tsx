@@ -9,6 +9,8 @@ import React from 'react';
 import { StatusBar, StyleSheet, useColorScheme } from 'react-native';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
+import { Provider } from 'react-redux';
+import { store } from './src/store/store';
 
 import TabNavigator from './src/navigation/TabNavigator';
 
@@ -17,12 +19,16 @@ function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <SafeAreaProvider>
-        <NavigationContainer>
-          <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-          <TabNavigator />
-        </NavigationContainer>
-      </SafeAreaProvider>
+      <Provider store={store}>
+        <SafeAreaProvider>
+          <NavigationContainer>
+            <StatusBar
+              barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+            />
+            <TabNavigator />
+          </NavigationContainer>
+        </SafeAreaProvider>
+      </Provider>
     </SafeAreaView>
   );
 }
