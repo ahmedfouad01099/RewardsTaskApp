@@ -2,6 +2,8 @@ import React, { useCallback } from 'react';
 import { FlatList, RefreshControl, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Reward } from '../types/reward';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { COLLECT_REWARD } from '../store/rewardsSlice';
 import RewardItem from '../components/RewardItem';
 import { useRewards } from '../hooks/useRewards';
 import { LoadingState } from '../components/LoadingState';
@@ -13,9 +15,32 @@ const AvailableRewardsScreen: React.FC = () => {
   const { rewards, loading, refreshing, error, handleLoadMore, handleRefresh } =
     useRewards();
 
+  const dispatch = useAppDispatch();
+  const collectedRewards = useAppSelector(
+    state => state.rewards.collectedRewards,
+  );
+
+  const handleCollect = useCallback(
+    (reward: Reward) => {
+      dispatch(COLLECT_REWARD(reward));
+    },
+    [dispatch],
+  );
+
+  const isRewardCollected = useCallback(
+    (rewardId: number) => collectedRewards.some(r => r.id === rewardId),
+    [collectedRewards],
+  );
+
   const renderItem = useCallback(
-    ({ item }: { item: Reward }) => <RewardItem reward={item} />,
-    [],
+    ({ item }: { item: Reward }) => (
+      <RewardItem
+        reward={item}
+        isCollected={isRewardCollected(item.id)}
+        onCollect={handleCollect}
+      />
+    ),
+    [isRewardCollected, handleCollect],
   );
 
   const keyExtractor = useCallback(

@@ -1,6 +1,11 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Reward } from '../types/reward';
 
-const initialState = {
+interface RewardsState {
+  collectedRewards: Reward[];
+}
+
+const initialState: RewardsState = {
   collectedRewards: [],
 };
 
@@ -8,7 +13,14 @@ const rewardsSlice = createSlice({
   name: 'rewards',
   initialState,
   reducers: {
-    COLLECT_REWARD: () => {},
+    COLLECT_REWARD: (state, action: PayloadAction<Reward>) => {
+      const existingReward = state.collectedRewards.find(
+        reward => reward.id === action.payload.id,
+      );
+      if (!existingReward) {
+        state.collectedRewards.push(action.payload);
+      }
+    },
   },
 });
 

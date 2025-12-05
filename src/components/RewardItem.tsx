@@ -4,23 +4,29 @@ import {
   Text,
   Image,
   StyleSheet,
-  Dimensions,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native';
 import { Reward } from '../types/reward';
 
 interface RewardItemProps {
   reward: Reward;
+  isCollected: boolean;
+  onCollect: (reward: Reward) => void;
 }
 
 const { width } = Dimensions.get('window');
 const ITEM_WIDTH = width - 32;
 
-const RewardItem: React.FC<RewardItemProps> = ({ reward }) => {
+const RewardItem: React.FC<RewardItemProps> = ({
+  reward,
+  isCollected,
+  onCollect,
+}) => {
   const imageUrl = reward.image ? reward.image : null;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, isCollected && styles.collectedContainer]}>
       {imageUrl && (
         <Image
           source={{ uri: imageUrl }}
@@ -29,21 +35,37 @@ const RewardItem: React.FC<RewardItemProps> = ({ reward }) => {
         />
       )}
       <View style={styles.content}>
-        <Text style={styles.name} numberOfLines={2}>
+        <Text
+          style={[styles.name, isCollected && styles.collectedText]}
+          numberOfLines={2}
+        >
           {reward.name}
         </Text>
         <View style={styles.footer}>
           <View style={styles.pointsContainer}>
-            <Text style={styles.points}>{reward.needed_points}</Text>
-            <Text style={styles.pointsLabel}>points</Text>
+            <Text style={[styles.points, isCollected && styles.collectedText]}>
+              {reward.needed_points}
+            </Text>
+            <Text
+              style={[styles.pointsLabel, isCollected && styles.collectedText]}
+            >
+              points
+            </Text>
           </View>
-          <TouchableOpacity
-            style={styles.collectButton}
-            onPress={() => {}}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.collectButtonText}>Collect</Text>
-          </TouchableOpacity>
+          {!isCollected && (
+            <TouchableOpacity
+              style={styles.collectButton}
+              onPress={() => onCollect(reward)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.collectButtonText}>Collect</Text>
+            </TouchableOpacity>
+          )}
+          {isCollected && (
+            <View style={styles.collectedBadge}>
+              <Text style={styles.collectedBadgeText}>Collected</Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -67,6 +89,9 @@ const styles = StyleSheet.create({
     elevation: 3,
     overflow: 'hidden',
   },
+  collectedContainer: {
+    opacity: 0.6,
+  },
   image: {
     width: '100%',
     height: 200,
@@ -80,6 +105,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#333',
     marginBottom: 12,
+  },
+  collectedText: {
+    color: '#999',
   },
   footer: {
     flexDirection: 'row',
@@ -108,6 +136,17 @@ const styles = StyleSheet.create({
   },
   collectButtonText: {
     color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  collectedBadge: {
+    backgroundColor: '#E0E0E0',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  collectedBadgeText: {
+    color: '#666',
     fontSize: 16,
     fontWeight: '600',
   },
